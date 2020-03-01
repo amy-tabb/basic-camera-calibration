@@ -119,12 +119,17 @@ int main(int argc, char** argv) {
 	double chess_mm_width = 0;
 	int chess_height = 0;
 	int chess_width = 0;
+	int zero_tangent_dist = 0;
+	int zero_k3 = 0;
+
 
 	while (1)
 	{
 		static struct option long_options[] =
 		{
 				{"help",   no_argument,       &print_help, 1},
+				{"zero-tangent", no_argument,       &zero_tangent_dist, 1},
+				{"zero-k3", no_argument,       &zero_k3, 1},
 				/* These options don’t set a flag.
 				             We distinguish them by their indices. */
 				{"input",   required_argument, 0, 'a'},
@@ -137,6 +142,9 @@ int main(int argc, char** argv) {
 
 			cout << "OPTIONAL FLAGS WITHOUT ARGUMENT -------------------" << endl;
 			cout << std::left << setw(30) << "--help" << "No arguments.  Prints this help information." << endl;
+			cout << std::left << setw(30) << "--zero-tangent " << "No arguments. In the camera calibration part, sets the tangential components of radial distortion (p1, p2) to zero." << endl;
+			cout << std::left << setw(30) << "--zero-k3 " << "No arguments. In the camera calibration part, sets the 3rd radial distortion k value to zero." << endl;
+
 
 			cout << endl;
 			cout << "DIRECTORIES AND PATHS ----------------------- " << endl;
@@ -292,7 +300,7 @@ int main(int argc, char** argv) {
 	// argument is whether or not to draw the corners
 	CaliObj.AccumulateCornersFlexibleExternal(true);
 
-	CaliObj.CalibrateFlexibleExternal(out,  write_directory);
+	CaliObj.CalibrateFlexibleExternal(out,  write_directory, zero_tangent_dist, zero_k3);
 
 	out.close();
 

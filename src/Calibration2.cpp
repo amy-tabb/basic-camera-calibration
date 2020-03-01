@@ -295,7 +295,8 @@ bool CaliObjectOpenCV2::AccumulateCornersFlexibleExternal(bool draw_corners){
 		cv::cvtColor(im, gimage, CV_BGR2GRAY);
 
 
-		corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf,  CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK + CALIB_CB_FILTER_QUADS);
+		corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf,
+				CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK + CALIB_CB_FILTER_QUADS);
 
 		if (corner_found) {
 
@@ -417,8 +418,7 @@ void CaliObjectOpenCV2::Calibrate(std::ofstream& out, string write_directory){
 	double rms = 0;
 
 	if (text_file.size() == 0){
-		//rms = cv::calibrateCamera(all_3d_corners, all_points, image_size, cameraMatrix, distCoeffs, rvecs, tvecs,
-		//		CV_CALIB_RATIONAL_MODEL);
+
 		// OpenCV versions
 		rms = cv::calibrateCamera(all_3d_corners, all_points, image_size, cameraMatrix, distCoeffs, rvecs, tvecs,
 				CALIB_RATIONAL_MODEL);
@@ -553,7 +553,7 @@ void CaliObjectOpenCV2::Calibrate(std::ofstream& out, string write_directory){
 	}
 }
 
-void CaliObjectOpenCV2::CalibrateFlexibleExternal(std::ofstream& out, string write_directory){
+void CaliObjectOpenCV2::CalibrateFlexibleExternal(std::ofstream& out, string write_directory, int zero_tangent_dist, int zero_k3){
 
 	// need to make the points 3D
 
@@ -626,7 +626,22 @@ void CaliObjectOpenCV2::CalibrateFlexibleExternal(std::ofstream& out, string wri
 
 	double rms = 0;
 
-	rms = cv::calibrateCamera(all_3d_corners, all_points_wo_blanks, image_size, cameraMatrix, distCoeffs, rvecs, tvecs);
+	int flags = 0;
+
+	if (zero_tangent_dist && !zero_k3){
+		flags = cv::CALIB_ZERO_TANGENT_DIST ;
+	}
+
+	if (!zero_tangent_dist && zero_k3){
+			flags = cv::CALIB_FIX_K3 ;
+		}
+
+	if (zero_tangent_dist && zero_k3){
+		flags =  cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_FIX_K3;
+	}
+
+
+	rms = cv::calibrateCamera(all_3d_corners, all_points_wo_blanks, image_size, cameraMatrix, distCoeffs, rvecs, tvecs, flags);
 
 	cout << "rms " << rms << endl;
 	cout << "camera matrix " << endl;

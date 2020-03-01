@@ -172,6 +172,8 @@ The only file in the source folder needed for the `aruco-pattern-write` executab
 Printing help for camera-as-scanner
 OPTIONAL FLAGS WITHOUT ARGUMENT -------------------
 --help                        No arguments.  Prints this help information.
+--zero-tangent                            No arguments. In the camera calibration part, sets the tangential components of radial distortion (p1, p2) to zero.
+--zero-k3                                 No arguments. In the camera calibration part, sets the 3rd radial distortion k value to zero.
 
 DIRECTORIES AND PATHS ----------------------- 
 --input=[STRING]              Mandatory, has to be a directory.
@@ -181,11 +183,19 @@ The aguments are :
 - `--input` = read directory, 
 - `--output` = write directory,
 
+and optional no-argument flags are `--zero-tangent` and `--zero-k3`. Sometimes when the number of poses does not provide enough variety, the distortion coefficient estimation will not be desirable. You can check [Contents of the output directory](#contents-of-the-output-directory) to see if the radial distorion parameters are appropriate.  Details on these parameters in OpenCV [here](https://docs.opencv.org/2.4/doc/tutorials/calib3d/camera_calibration/camera_calibration.html).
+
 
 An example valid run command is:
 
 ```
 ./basic-chessboard-cali --input /my/input/dir --output /my/output/dir
+```
+
+or 
+
+```
+./basic-chessboard-cali --input /my/input/dir --output /my/output/dir --zero-k3
 ```
 
 Run time:

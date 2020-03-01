@@ -63,7 +63,7 @@ public:
 
 	void Calibrate(std::ofstream& out, string write_directory);
 
-	void CalibrateFlexibleExternal(std::ofstream& out, string write_directory);
+	void CalibrateFlexibleExternal(std::ofstream& out, string write_directory, int zero_tangent_dist = 0, int zero_k3 = 0);
 
 
 };
