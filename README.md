@@ -11,6 +11,7 @@ This repository is a companion to a webinar on camera calibration presented on [
 
 Roadmap
 - [What it does](#what-it-does-single-camera-chessboard-calibration)
+- [Docker release](#docker-release)
 - [Dependences](#dependencies)
 	- [Tested operating system](#tested-operating-system)
 	- [OpenCV 4](#opencv-4)
@@ -26,6 +27,58 @@ Roadmap
 * Input 2: a file describing the chessboard pattern: physical dimensions, and number of corners vertically and horizontally
 * Output 1: undistorted images of the original images, with the located pattern overlaid.
 * Output 2: `details.txt`, with internal calibration information (upper triangular matrix, radial distortion parameters), summed reprojection error, rotation and translation for every image for which a calibration pattern could be located.
+
+## Docker release
+
+To avoid building the code yourself, a Docker image of this project is available, and the Dockerfile used to generate it is part of this repository.  Docker is not always easy to parse, though, so whichever path you take is largely situation dependent.
+
+### Install Docker
+
+[Install Docker](https://docs.docker.com/install/), if you haven't already.  I endorse uninstalling old versions if you have them floating around.
+
+### Pull the image
+
+The image for basic-camera-calibration is : [amytabb/basic-camera-calibration](https://hub.docker.com/r/amytabb/basic-camera-calibration).
+
+```bash
+docker pull amytabb/basic-camera-calibration
+```
+
+### Run the image
+
+This code will write the results to disk; to do so with Docker means that we need to mount a portion of your hard drive to a volume in the Docker image.
+
+I used a bind mount below; the Docker image's volume is `host_dir` and will not change no matter which machine or dataset you run it on.  `/full/file/path/on/your/machine` is the directory that you want the reading and writing to occur.  
+
+Example:
+
+```bash
+sudo docker run -v /full/file/path/on/your/machine:/host_dir -it amytabb/basic-camera-calibration:latest bash
+```
+
+The bind mount is potentially confusing, so here is an example.  Say I have a directory `/home/amy/Data/March/` and within `March` is a directory of images that I want to process with basic-camera-calibration.  I also want to write to a directory within `/home/amy/Data/March/`.  So, 
+
+```bash
+sudo docker run -v /home/amy/Data/March:/host_dir -it basic-camera-calibration:latest bash
+```
+
+Creates a container with all of the libraries and a Ubuntu 18.04 operating system, and bash shell (command line), and may look something like:
+
+```bash
+root@f6feb7ce8c31:/host_dir# 
+```
+
+but if you take a look at the contents of `/host_dir`, with `ls`, they are `/home/amy/Data/March/`.  That's the bind mount magic.
+
+First, suppose we forgot to create the write directory.  No problem.
+
+```bash
+root@f6feb7ce8c31:/host_dir# mkdir write-dir
+```
+
+creates our write directory `write-dir`.
+
+And from here on out, we issue commands from this Docker container, which is writing to our filesystem.  Skip to [Running camera-as-scanner executable](#running-basic-chessboard-cali-executable) to get details on how to run the code.  The only difference is that `./` is not needed before commands when using the Docker version.
 
 ## Dependencies
 

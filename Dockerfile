@@ -14,3 +14,5 @@ RUN cmake ../src
 RUN make
 
 RUN make install
+
+WORKDIR /host_dir
