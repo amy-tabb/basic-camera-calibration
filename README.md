@@ -241,3 +241,5 @@ Rt for cam 0
 -0.0319937 -0.988133 -0.150229 217.661 
 -0.0142611 -0.149839 0.988607 1657.55 
 ```
+
+and also includes the undistorted images using the camera calibration patterns in the details.txt file.  If a pattern was detetected, it is written on the pattern (with a colored pattern).  Ideally, straight lines in the physical world should be straight in these images if the calibration has been effective.
