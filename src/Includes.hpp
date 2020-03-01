@@ -23,8 +23,8 @@
 #include <set>
 #include <cmath>
 #include <cstdint>
-#include <omp.h>
-
+//#include <omp.h>
+#include <sys/stat.h>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/mat.hpp>
@@ -35,6 +35,8 @@
 #include <opencv2/imgproc.hpp>
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
+
+
 
 
 using namespace Eigen;

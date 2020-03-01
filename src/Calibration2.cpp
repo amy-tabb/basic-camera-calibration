@@ -40,7 +40,7 @@ void CaliObjectOpenCV2::ReadImages(string internal_dir, bool flag){
 
 
 	for (int c = 0; c < int(im_names.size()); c++){
-		filename = internal_dir + "/" + im_names[c];
+		filename = internal_dir + im_names[c];
 		cout << "Image name " << im_names[c] << endl;
 		if (filename.size() > 3 && filename.substr(filename.size() - 3, filename.size()) != txt_ext){
 			cout << "Reading filename .... " << filename << endl;
@@ -219,7 +219,6 @@ bool CaliObjectOpenCV2::AccumulateCorners(bool draw_corners){
 
 bool CaliObjectOpenCV2::AccumulateCornersFlexibleExternal(bool draw_corners){
 
-	//IplImage        *cimage = 0,		*gimage = 0, *result = 0;
 	cv::Mat im, gimage, result;
 	string current_name;
 	bool corner_found;
@@ -246,32 +245,23 @@ bool CaliObjectOpenCV2::AccumulateCornersFlexibleExternal(bool draw_corners){
 		im = internal_images[i];
 		cv::cvtColor(im, gimage, CV_BGR2GRAY);
 
-		// < OpenCV 3.4
-		//corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf,  CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FAST_CHECK | CV_CALIB_CB_NORMALIZE_IMAGE | CV_CALIB_CB_FILTER_QUADS);
-		// OpenCV version differences
 		corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf,  CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK + CALIB_CB_FILTER_QUADS);
 
 		if (corner_found) {
 
-			// need to flip the orientation, possibly ...
-
-			//corners[chess_w*chess_h];
+			cout << "Corners found for " << i << endl;
 
 			first_point = pointBuf[0];
 			last_point = pointBuf[chess_w*chess_h - 1];
 
 			if (first_point.y < last_point.y){
-				//if (first_point.x > last_point.x){
-				cout << "WRONG ORIENTATION! " << endl;
-
-
+				// need to flip the orientation, possibly ... this is application dependant.
 				for (int k=0; k<corner_count; k++) {
 
 					flipped_points[k] = pointBuf[chess_w*chess_h - 1 - k];
 				}
 
 				pointBuf.swap(flipped_points);
-
 			}
 
 			some_found = true;
@@ -290,7 +280,8 @@ bool CaliObjectOpenCV2::AccumulateCornersFlexibleExternal(bool draw_corners){
 			cout << "Number of patterns " << all_points.size() << endl;
 			number_internal_images_written++;
 
-
+		}	else {
+			cout << "Did not find corners for for " << i << endl;
 		}
 	}
 
@@ -303,48 +294,22 @@ bool CaliObjectOpenCV2::AccumulateCornersFlexibleExternal(bool draw_corners){
 		im = external_images[i];
 		cv::cvtColor(im, gimage, CV_BGR2GRAY);
 
-		//corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf,  CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FAST_CHECK | CV_CALIB_CB_NORMALIZE_IMAGE | CV_CALIB_CB_FILTER_QUADS);
-		// OpenCV version differences
-		corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf,  CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK + CALIB_CB_FILTER_QUADS);
 
-//		if (!corner_found){
-//			cout << "Trying default option " << endl;
-//			corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf);
-//		}
-//
-//		if (!corner_found){
-//			cout << "Trying  option one" << endl;
-//			//corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf, CV_CALIB_CB_NORMALIZE_IMAGE);
-//			corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf,  CALIB_CB_NORMALIZE_IMAGE);
-//		}
-//
-//		if (!corner_found){
-//			cout << "Trying  option two" << endl;
-//			//corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf, CV_CALIB_CB_FILTER_QUADS);
-//			corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf,  CALIB_CB_FILTER_QUADS);
-//		}
-//
-//		if (!corner_found){
-//			cout << "Trying  option three" << endl;
-//			//corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf, CV_CALIB_CB_ADAPTIVE_THRESH);
-//			corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf,  CALIB_CB_ADAPTIVE_THRESH);
-//		}
+		corner_found = cv::findChessboardCorners(gimage, boardsize, pointBuf,  CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK + CALIB_CB_FILTER_QUADS);
 
 		if (corner_found) {
 
+			cout << "Corners found for " << i << endl;
 			// need to flip the orientation, possibly ...
 			first_point = pointBuf[0];
 			last_point = pointBuf[chess_w*chess_h - 1];
 
 			if (first_point.y < last_point.y){
-				//if (first_point.x > last_point.x){
-				cout << "WRONG ORIENTATION! " << endl;
-
+			// flipping orientation, this is application dependant.
 
 				for (int k=0; k<corner_count; k++) {
 
 					flipped_points[k] = pointBuf[chess_w*chess_h - 1 - k];
-
 				}
 
 				pointBuf.swap(flipped_points);
@@ -367,6 +332,7 @@ bool CaliObjectOpenCV2::AccumulateCornersFlexibleExternal(bool draw_corners){
 
 			cout << "Number of patterns " << all_points.size() << endl;
 		}	else {
+			cout << "Did not find corners for for " << i << endl;
 			all_points.push_back(vector<cv::Point2f>());
 		}
 	}
@@ -622,6 +588,11 @@ void CaliObjectOpenCV2::CalibrateFlexibleExternal(std::ofstream& out, string wri
 
 	}
 
+	if (all_points_wo_blanks.size() == 0){
+		cout << "No corners were found, so the code will fail at cv::calibrateCamera. Quitting." << endl;
+		exit(1);
+	}
+
 	cv::Mat cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
 
 	cv::Mat distCoeffs = cv::Mat::zeros(4, 1, CV_64F);
@@ -720,23 +691,14 @@ void CaliObjectOpenCV2::CalibrateFlexibleExternal(std::ofstream& out, string wri
 		err = cv::norm(cv::Mat(all_points_wo_blanks[m]), cv::Mat(imagePoints2), CV_L2);              // difference
 		reproj_error        += err*err;
 
-
-		// su
 	}
 
 	out << endl << "Summed reproj error " << reproj_error << endl << endl;
 
-	//Matrix temp;
 	for (int m = number_internal_images_written; m < int(all_points.size()); m++){
 		Rts.push_back(vector<vector <double> >());
 	}
 
-	//	cout << "Line 1364 " << endl;
-	//	cout << "number internal images written " << number_internal_images_written << endl;
-	//	cout << "Number of total pattterns " << all_points_wo_blanks.size() << endl;
-	//	cout << "Number rvecs " << rvecs.size() << endl;
-	//	cout << "Number Rts " << Rts.size() << endl;
-	//	cin >> ch;
 	// we only want these for the external images ....
 	for (int m = number_internal_images_written; m < int(all_points_wo_blanks.size()); m++){
 
@@ -751,13 +713,8 @@ void CaliObjectOpenCV2::CalibrateFlexibleExternal(std::ofstream& out, string wri
 
 			tempRt[i][3] = tvecs[m].at<double>(i);
 		}
-		//		cout << "after tempRT " << endl; cin >> ch;
-		//
-		//		cout << "mapping " << mapping_from_limited_to_full.at(m) << endl; cin >> ch;
 
-		//Rts.push_back(tempRt);
 		Rts[mapping_from_limited_to_full.at(m) - number_internal_images_written] = tempRt;
-		//cout << "RTs " << endl; cin >> ch;
 
 		out << "Rt for cam " << mapping_from_limited_to_full[m] - number_internal_images_written << endl;
 		for (int i = 0; i < 3; i++){
@@ -771,7 +728,6 @@ void CaliObjectOpenCV2::CalibrateFlexibleExternal(std::ofstream& out, string wri
 	}
 
 	cout << "Finish with cali ... " << endl;
-	//cin >> ch;
 
 	cv::Mat view, rview, map1, map2;
 	cv::Mat gray;
@@ -783,9 +739,7 @@ void CaliObjectOpenCV2::CalibrateFlexibleExternal(std::ofstream& out, string wri
 		cout << "Writing external " << i << endl;
 		cv::remap(external_images[i], rview, map1, map2, cv::INTER_LINEAR);
 
-		//cv::cvtColor(rview, gray, CV_BGR2GRAY);
-		//cv::cvtColor(gray, rview, CV_GRAY2BGR);
-		filename  = write_directory + "/ext" + ToString<int>(i) + ".png";
+		filename  = write_directory + "ext" + ToString<int>(i) + ".png";
 		cv::imwrite(filename.c_str(), rview);
 	}
 }
