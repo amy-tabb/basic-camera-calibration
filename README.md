@@ -1,13 +1,16 @@
 # basic-camera-calibration
-This is basic camera calibration using a chessboard, OpenCV 4.0, C++. 
+
+This is basic camera calibration using a chessboard, OpenCV >= 4.0, C++. 
 
 Author: Amy Tabb.
 
-28 November 2018, an 2 December 2018.
+28 November 2018
+- 2 December 2018.
+- March 2020
 
-Major update early March, 2020.
+Major update throughout March, 2020.  Updates are planned throughout 2020.
 
-This repository is a companion to a webinar on camera calibration presented on [Plantae](https://plantae.org/), however viewing the webinar is not necessary to use and understand this code.  This code is a cleaned-up version of the camera calibration portion of another repository of mine, for [robot-world, hand-eye calibration](https://github.com/amy-tabb/RWHEC-Tabb-AhmadYousef).   
+This repository was orginally a companion to a webinar on camera calibration presented on [Plantae](https://plantae.org/), however viewing the webinar is not necessary to use and understand this code.  Originally, this code was a cleaned-up version of the camera calibration portion of another repository of mine, for [robot-world, hand-eye calibration](https://github.com/amy-tabb/RWHEC-Tabb-AhmadYousef), bit now is a different codebase altogether.   
 
 Roadmap
 - [What it does](#what-it-does-single-camera-chessboard-calibration)
@@ -27,6 +30,7 @@ Roadmap
 * Input 2: a file describing the chessboard pattern: physical dimensions, and number of corners vertically and horizontally
 * Output 1: undistorted images of the original images, with the located pattern overlaid.
 * Output 2: `details.txt`, with internal calibration information (upper triangular matrix, radial distortion parameters), summed reprojection error, rotation and translation for every image for which a calibration pattern could be located.
+* Optionally: generate a chessboard image for printing.  You provide a `calibration_object.txt` file (see below).
 
 ## Docker release
 
@@ -82,7 +86,7 @@ And from here on out, we issue commands from this Docker container, which is wri
 
 ## Dependencies
 
-This code uses the OpenCV 4.0, Eigen and is written in C++. 
+This code uses the OpenCV 4.0, Eigen and is written in C++. OpenMP is used for parallelization, so OpenMP is required in this version of the repository.
 
 ### Tested operating system
 
@@ -169,17 +173,21 @@ The only file in the source folder needed for the `aruco-pattern-write` executab
 ```bash
 ./basic-chessboard-cali --help
 
-Printing help for camera-as-scanner
+Printing help for basic-camera-cali
 OPTIONAL FLAGS WITHOUT ARGUMENT -------------------
 --help                        No arguments.  Prints this help information.
---zero-tangent                            No arguments. In the camera calibration part, sets the tangential components of radial distortion (p1, p2) to zero.
---zero-k3                                 No arguments. In the camera calibration part, sets the 3rd radial distortion k value to zero.
+--zero-tangent                No arguments. In the camera calibration part, sets the tangential components of radial distortion (p1, p2) to zero.
+--zero-k3                     No arguments. In the camera calibration part, sets the 3rd radial distortion k value to zero.
+--create-pattern              No arguments. Creates a pattern image given the parameters for chess_height, chess_width in calibration_object.txt.
 
-DIRECTORIES AND PATHS ----------------------- 
+DIRECTORIES AND OPTIONS ----------------------- 
 --input=[STRING]              Mandatory, has to be a directory.
 --output=[STRING]             Mandatory, has to be a directory.
-```
-The aguments are : 
+--number-threads=[INT]        Optional, number of threads for parallel operational. Default is omp_get_max_threads() 
+--camera-size=[float]         Optional, size of the cameras in the .ply files.  Units will be the same units as in calibration object.txt.  In other words, the units of the calibration will be the same units for this item.  Default is 40.
+````
+
+The arguments are : 
 - `--input` = read directory, 
 - `--output` = write directory,
 
@@ -199,7 +207,15 @@ or
 ```
 
 Run time:
-It will take some time (on the order of 4 minutes) to perform camera calibration.  This depends on the number of images in the dataset.
+The run time depends on the number of images in the dataset, and whether the pattern can be found in them.  Currently, the total run time is 6 seconds on a high performance computer (12 cores), and 26 seconds on that same computer with `--number-threads=1`.
+
+### Creating a calibration pattern to print
+
+To do so, use the `--create-pattern` flag and input and output directories.  `pattern.png` will be written to the output directory.  After printing, you will have to measure and fill in the values for `chess_mm_height` and `chess_mm_width` in the `calibration_object.txt` file to calibrate a camera using this code and the pattern.
+
+```
+./basic-chessboard-cali --input /my/input/dir --output /my/output/dir --create-pattern
+```
 
 ## Required structure of the input directory
 
