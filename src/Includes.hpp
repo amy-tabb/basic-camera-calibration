@@ -23,40 +23,41 @@
 #include <set>
 #include <cmath>
 #include <cstdint>
-//#include <omp.h>
+#include <omp.h>
 #include <sys/stat.h>
+#include <sys/time.h>
+#include <chrono>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/aruco.hpp>
+#include <opencv2/aruco/charuco.hpp>
 #include <opencv2/core/utility.hpp>
 #include <opencv2/imgproc.hpp>
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 
-
-
-
-using namespace Eigen;
-
 using std::vector;
 using std::ifstream;
 using std::string;
 
+using namespace Eigen;
+using namespace cv;
+using std::vector;
+using std::ifstream;
+using std::ofstream;
+using std::string;
 
-using std::set;
-using std::max;
-using std::min;
+
 using std::cin;
 using std::cout;
 using std::endl;
 using std::string;
-using std::list;
 using std::vector;
-using std::map;
-using std::pair;
+
 
 
 template<class T>
