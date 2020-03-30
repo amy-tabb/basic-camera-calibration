@@ -13,7 +13,6 @@
 #include "calibration.hpp"
 #include "basic-camera-cali.hpp"
 
-// redo help.
 
 int main(int argc, char** argv) {
 
@@ -286,7 +285,7 @@ int main(int argc, char** argv) {
 		out << "Everything ... " << std::chrono::duration_cast<std::chrono::seconds>(end_timer - start_timer).count() << " seconds " << endl;
 		out << "Everything ... " << std::chrono::duration_cast<std::chrono::milliseconds>(end_timer - start_timer).count() << " milliseconds " << endl;
 
-		out << " with this many threads " << omp_get_num_threads() << endl;
+		out << " with this many threads " << omp_get_max_threads() << endl;
 
 		out.close();
 	}
