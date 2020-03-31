@@ -20,46 +20,7 @@ using namespace std;
 
 enum cali_type{chess, charuco, aruco};
 
-// check all of the cases.
-//class PatternsCreatedCharuco{
-//public:
-//	vector<vector<int> > double_to_single;
-//	vector< cv::Point3f> three_d_points;
-//	vector< cv::Point3f> three_d_points_internal; // for strawberry case
-//	cv::Ptr<cv::aruco::Dictionary> dictionary;
-//	vector<cv::Ptr<cv::aruco::CharucoBoard> > boards; /// for refining the estimate of corner locations
-//	vector< vector<int> > display_colors;
-//	vector<pair<int, int> > min_max_id_pattern;
-//	vector<pair<int, int> > min_max_id_squares;
-//	vector<pair<int, int> > square_h_w;
-//	bool rotate_case;
-//	vector<int> single_aruco_ids;
-//	int max_internal_patterns;
-//	int internalx, internaly;
-//
-//	PatternsCreatedCharuco(string read_dir, string write_dir, bool rotate, string src_file, bool generate_only);
-//
-//	void DetermineBoardsPresentFromMarkerList(vector<int>& markers, vector<bool>& boards_seen);
-//	int MappingArucoIDToPatternNumber(int id);
-//
-//	cv::Scalar Color(int index);
-//
-//	int NumberMarkers();
-//	int NumberSquares();
-//	int NumberPatterns();
-//
-//	void SetNumberMarkers(int n);
-//	void SetNumberPatterns(int n);
-//
-//protected:
-//	int number_patterns;
-//	int number_total_squares;
-//	int int_number_markers;
-//
-//};
 
-// todo clean up
-// change the class name.
 class CaliObjectOpenCV2{
 public:
 	cali_type c_type = chess;
